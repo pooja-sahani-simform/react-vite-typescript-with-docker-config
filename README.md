@@ -1,31 +1,95 @@
-# React + TypeScript + Vite
+<h1 align="center">React Vite + TypeScript + Docker Project ✨️</h1> 
+<p align="center">This project is a template for a React application using Vite, TypeScript, and Docker.</p>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Prerequisites
 
-Currently, two official plugins are available:
+- [Node.js](https://nodejs.org/) installed
+- [Docker](https://www.docker.com/) installed
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+# Installation Steps
 
-- Configure the top-level `parserOptions` property like this:
+### Clone the repository ⎘
+```bash
+git clone https://github.com/pooja-sahani-simform/react-vite-typescript-with-docker-config.git
 
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+### Change the working directory 
+```bash
+cd react-vite-with-docker
+```
 
-## Starting application from docker follow below command
-1. sudo docker build -t react-vite-with-docker .
-2. sudo docker run -p 3000:3000 react-vite-with-docker
+### Install dependency 
+```bash
+npm i
+```
+### Build the Docker Container
+Run this command to build the image on your local machine and start the container. You only need to run this command the first time, and whenever you make changes to docker-compose.yml.
+
+```bash
+docker-compose up --build --no-recreate -d
+
+```
+
+From the second time, we can use
+```bash
+docker-compose up -d
+```
+
+Now our container is up and you should be able to test it using the following command.
+```bash
+docker-compose ps
+```
+
+### Build and start the Application
+Just to clarify, we have a running container, but not the installed or running react app. For that, we need to log into the container and then execute the below commands to start the react vite application from docker container.
+
+```bash
+docker exec -it vite_docker sh -c 'npm i && npm run dev'
+```
+
+You are all set! Open [localhost:8000](http://localhost:8000/) to see the app.
+
+
+
+# Additional Detail for customized configuration
+
+### Update Vite Config 
+We need to specify the host and port in vite.config.js in order to work with the Docker. you custimized based on your requirements.
+
+```bash
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    host: '0.0.0.0',
+    port: 8000,
+    watch: {
+      usePolling: true,
+    }
+  },
+})
+```
+
+### Setup Docker
+I am intending to use docker-composer for easier to scale as compared to relying on Dockerfile.
+First, we will need to add docker-compose.yml within the root of the project.(Note: Just verify the ports, working_dir, volumes target based on your project requirements). For more details on docker-compose.yml you follow this [docker-compose commands](https://docs.docker.com/engine/reference/commandline/compose/)
+
+```bash
+version: "3.4"
+services:
+ vite_docker:
+   image: node:alpine
+   container_name: vite_docker
+   entrypoint: /bin/sh
+   ports:
+     - 8000:8000
+   working_dir: /src/app
+   volumes:
+     - type: bind
+       source: ./
+       target: /src/app
+   tty: true
+```
+

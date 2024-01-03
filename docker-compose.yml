@@ -2,7 +2,7 @@ version: "3.4"
 services:
   vite_docker:
     image: node:alpine
-    container_name: vite_docker
+    container_name: react-vite-with-docker
     entrypoint: /bin/sh
     ports:
       - 8000:8000
@@ -10,5 +10,5 @@ services:
     volumes:
       - type: bind
         source: ./
-        target: /srv/app
+        target: /src/app
     tty: true
